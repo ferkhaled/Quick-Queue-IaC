@@ -1,14 +1,64 @@
 ---
 
 - hosts: all
-  vars: 
-    ansile_host_key_checking: flase
-  become: true
+  become: yes
   pre_tasks:
 
-  - name: install updates (Ubuntu)
+  - name: install updates (Debian)
     tags: always
     apt:
       upgrade: dist
       update_cache: yes
-      
+    when: ansible_distribution == "Debian"
+
+  - name: install sudoers for Debian servers
+    tags: debian
+    apt:
+      name:
+        - sudo
+      state: latest
+    when: ansible_distribution == "Debian"
+
+- hosts: all
+  become: true
+  tasks:
+
+  - name: create a new user khaled
+    tags: always
+    user:
+      name: khaled
+      groups: root
+      shell: "/bin/bash"
+
+  - name: Set authorized key taken from file
+    authorized_key:
+      user: khaled
+      state: present
+      key: "{{ lookup('file', '~/.ssh/qq_rsa.pub') }}"
+
+  - name: add sudoers file for khaled
+    tags: always
+    copy:
+      src: sudoer_khaled
+      dest: /etc/sudoers.d/khaled
+      owner: root
+      group: root
+      mode: 0440
+
+  - name: generate sshd_config file from template
+    tags: ssh
+    vars:
+      ssh_users: khaled
+    template:
+      src: "sshd_config.j2"
+      dest: /etc/ssh/sshd_config
+      owner: root
+      group: root
+      mode: 0644
+    notify: restart_sshd
+
+  handlers:
+  - name: restart_sshd
+    service:
+      name: sshd
+      state: restarted
