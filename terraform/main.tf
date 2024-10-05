@@ -155,6 +155,6 @@ resource "local_file" "inventory" {
 
 resource "aws_key_pair" "my_key" {
   key_name   = "my-key"
-  public_key = file("qq_rsa.pub")  # Path to your public SSH key
+  public_key = file("~/.ssh/qq_rsa.pub")  # Path to your public SSH key
 }
 
