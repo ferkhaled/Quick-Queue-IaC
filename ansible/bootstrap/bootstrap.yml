@@ -1,0 +1,14 @@
+---
+
+- hosts: all
+  vars: 
+    ansile_host_key_checking: flase
+  become: true
+  pre_tasks:
+
+  - name: install updates (Ubuntu)
+    tags: always
+    apt:
+      upgrade: dist
+      update_cache: yes
+      

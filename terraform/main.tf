@@ -102,8 +102,7 @@ resource "aws_instance" "qq_k8s_master" {
   subnet_id                   = aws_subnet.public.id
   vpc_security_group_ids      = [aws_security_group.allow_ssh.id]
   associate_public_ip_address = true  # Enable public IP
-
- key_name = "my-key"  # Reference your key pair for SSH access
+  key_name = "my-key"  # Reference your key pair for SSH access
 
   tags = {
     Name = "qq_k8s_master"
@@ -117,7 +116,7 @@ resource "aws_instance" "qq_k8s_node_1" {
   instance_type = "t3.micro"               # Instance type with 1 vCPU (t3.micro)
   subnet_id     = aws_subnet.public.id    # Launch in private subnet
   key_name      = "my-key"                 # Specify SSH key (optional)
-
+  vpc_security_group_ids      = [aws_security_group.allow_ssh.id]
   tags = {
     Name = "qq_k8s_node_1"
   }
@@ -130,8 +129,9 @@ resource "aws_instance" "qq_k8s_node_2" {
   instance_type = "t3.micro"               # Instance type with 1 vCPU (t3.micro)
   subnet_id     = aws_subnet.public.id    # Launch in private subnet
   key_name      = "my-key"                 # Specify SSH key (optional)
+  vpc_security_group_ids      = [aws_security_group.allow_ssh.id]
 
-  tags = {
+tags = {
     Name = "qq_k8s_node_2"
   }
  associate_public_ip_address = true      # This is a private instance, no public IP
@@ -145,7 +145,7 @@ resource "local_file" "inventory" {
   content = templatefile("ansible_inventory.tftpl", {
     master_ip = aws_instance.qq_k8s_master.public_ip
     node_ips = [
-      aws_instance.qq_k8s_node_2.public_ip,
+      aws_instance.qq_k8s_node_1.public_ip,
       aws_instance.qq_k8s_node_2.public_ip
     ]
   })
