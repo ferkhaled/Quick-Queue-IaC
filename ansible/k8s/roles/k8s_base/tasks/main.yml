@@ -54,4 +54,6 @@
           - kubeadm 
           - kubernetes-cni
           - kubectl
+          - python3-pip
+          - pipx
       become: true
