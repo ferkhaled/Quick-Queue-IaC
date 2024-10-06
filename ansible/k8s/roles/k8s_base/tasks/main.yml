@@ -8,7 +8,7 @@
       command: swapoff -a
       when: ansible_swaptotal_mb > 0
 
-    - name: Debian | Remove SWAP from fstab K8S will not work with swap enabled (2/2)
+    - name: Remove SWAP from fstab K8S will not work with swap enabled (2/2)
       mount:
         name: "{{ item }}"
         fstype: swap
@@ -20,32 +20,38 @@
 
 
 
-- name: Check if the kubernetes signing key file exists
-  stat:
-    path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-  register: k8s_gpg_key_check
 
 
 
-- name: Download the public signing key for the Kubernetes package repositories
-  shell: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-  when: not k8s_gpg_key_check.stat.exists
 
-- name: Add repository for kubernetes 1.28 to Apt sources
-  ansible.builtin.lineinfile:
-    path: /etc/apt/sources.list.d/kubernetes.list
-    line: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /"
-    state: present
-    create: yes
-  become: true
-  register: out_add_repository
+    - name: Check if the kubernetes signing key file exists
+      stat:
+        path: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      register: k8s_gpg_key_check
 
 
 
-- name: Debian | Install Dependencies
-  package: name={{ item }} state=present force=yes install_recommends=no
-  loop: "{{ k8s_dependencies }}"
 
-- name: Debian | Install Kubernetes Packages
-  package: name={{ item }} state=present force=yes install_recommends=no
-  loop: "{{ k8s_packages }}"
+
+    - name: Download the public signing key for the Kubernetes package repositories
+      shell: curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+      when: not k8s_gpg_key_check.stat.exists
+
+    - name: Add repository for kubernetes 1.28 to Apt sources
+      ansible.builtin.lineinfile:
+        path: /etc/apt/sources.list.d/kubernetes.list
+        line: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /"
+        state: present
+        create: yes
+      become: true
+      register: out_add_repository
+
+    - name: Install packages needed to use the Kubernetes apt repository  $$################$$$$$$
+      apt:
+        update_cache: true
+        name:
+          - kubelet 
+          - kubeadm 
+          - kubernetes-cni
+          - kubectl
+      become: true

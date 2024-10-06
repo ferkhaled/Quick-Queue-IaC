@@ -96,7 +96,7 @@ ingress = [
 
 # Create an EC2 instance with 2 vCPUs (using t3.medium as example)
 resource "aws_instance" "qq_k8s_master" {
-  ami           = "ami-0e86e20dae9224db8" # Amazon Linux 2 AMI ID (choose the region-appropriate one)
+  ami           = "ami-064519b8c76274859" # Amazon Linux 2 AMI ID (choose the region-appropriate one)
   instance_type = "t3.medium"             # Instance type with 2 vCPUs
 
   subnet_id                   = aws_subnet.public.id
@@ -112,7 +112,7 @@ resource "aws_instance" "qq_k8s_master" {
 
 # Create two private VPS with 1 CPU each
 resource "aws_instance" "qq_k8s_node_1" {
-  ami           = "ami-0e86e20dae9224db8"  # Same AMI for Ubuntu
+  ami           = "ami-064519b8c76274859"  # Same AMI for Ubuntu
   instance_type = "t3.micro"               # Instance type with 1 vCPU (t3.micro)
   subnet_id     = aws_subnet.public.id    # Launch in private subnet
   key_name      = "my-key"                 # Specify SSH key (optional)
@@ -125,7 +125,7 @@ resource "aws_instance" "qq_k8s_node_1" {
 }
 
 resource "aws_instance" "qq_k8s_node_2" {
-  ami           = "ami-0e86e20dae9224db8"  # Same AMI for Ubuntu
+  ami           = "ami-064519b8c76274859"  # Same AMI for Ubuntu
   instance_type = "t3.micro"               # Instance type with 1 vCPU (t3.micro)
   subnet_id     = aws_subnet.public.id    # Launch in private subnet
   key_name      = "my-key"                 # Specify SSH key (optional)
