@@ -69,7 +69,7 @@ resource "aws_security_group" "allow_ssh" {
   vpc_id      = aws_vpc.main.id
 
 ingress = [
-    for port in [22, 8080, 9000, 9090, 80] : {
+    for port in [22, 443, 6443, 2379, 2380, 10250, 10259, 10257, 10256] : {
       description      = "TLS from VPC"
       from_port        = port
       to_port          = port

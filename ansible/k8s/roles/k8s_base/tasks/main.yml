@@ -56,4 +56,5 @@
           - kubectl
           - python3-pip
           - pipx
+          - cifs-utils
       become: true

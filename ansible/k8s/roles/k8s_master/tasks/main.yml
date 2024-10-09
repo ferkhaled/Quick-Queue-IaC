@@ -49,24 +49,21 @@
           group: "{{ k8s_user }}"
           mode: "0640"     
 
-          #      - name: Install calico operator {{ calico_operator_config }}
-          #  become: false
-          # command: kubectl create -f "{{ k8s_user_home }}/{{ calico_operator_config }}"
+      - name: Install calico operator {{ calico_operator_config }}
+        become: false
+        command: kubectl create -f "{{ k8s_user_home }}/{{ calico_operator_config }}"
 
-          # - name: Set CALICO_IPV4POOL_CIDR to {{ k8s_pod_network }}
+      - name: Set CALICO_IPV4POOL_CIDR to {{ k8s_pod_network }}
+        replace:
+          path: "{{ k8s_user_home }}/{{ calico_net_config }}"
+          regexp: "192.168.0.0/16"
+          replace: "{{ k8s_pod_network }}"
 
-
-          #        replace:
-         
-          # path: "{{ k8s_user_home }}/{{ calico_net_config }}"
-          # regexp: "192.168.0.0/16"
-          # replace: "{{ k8s_pod_network }}"
-
-          #      - name: Install calico pod network {{ calico_net_config }}
-          #        become: false
-          #        command: kubectl apply -f "{{ k8s_user_home }}/{{ calico_net_config }}"
-
-          #      when: not calico.stat.exists
+      - name: Install calico pod network {{ calico_net_config }}
+        become: false
+        command: kubectl apply -f "{{ k8s_user_home }}/{{ calico_net_config }}"
+        
+      when: not calico.stat.exists
 
     - name: wait for k8s API port to open
       wait_for:
